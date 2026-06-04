@@ -24,7 +24,18 @@ jobs:
           import json, re, urllib.request
           from datetime import datetime, timezone
 
-          def fetch_rss(rss_url):
+          KEYWORDS = [
+              '外卖', '美团', '饿了么', '抖音', '抖音外卖', 'AI', '人工智能',
+              '餐饮', '闪购', '美团闪购', '即时零售', '本地生活', '配送',
+              '骑手', '商家', '外卖平台', '饿了么', '美团外卖', '饿了么外卖',
+              '餐厅', '饭店', '奶茶', '咖啡', '快餐', '生鲜', '京东外卖',
+              '外卖员', '众包', '专送', '拼好饭', '饿了么星选'
+          ]
+
+          def is_relevant(text):
+              return any(kw in text for kw in KEYWORDS)
+
+          def fetch_rss(rss_url, max_items=10):
               api = f"https://api.rss2json.com/v1/api.json?rss_url={urllib.request.quote(rss_url)}"
               try:
                   req = urllib.request.Request(api, headers={"User-Agent": "Mozilla/5.0"})
@@ -33,12 +44,14 @@ jobs:
                   if data.get("status") != "ok":
                       return []
                   items = []
-                  for item in data.get("items", [])[:5]:
+                  for item in data.get("items", [])[:max_items]:
                       title = re.sub(r'<[^>]+>', '', item.get("title", "")).strip()
                       desc = re.sub(r'<[^>]+>', ' ', item.get("description", "")).strip()
                       desc = re.sub(r'\s+', ' ', desc)[:120]
                       pub = item.get("pubDate", "")
                       link = item.get("link", "")
+                      if not title:
+                      continue
                       items.append({"title": title, "summary": desc, "pubDate": pub, "url": link})
                   return items
               except Exception as e:
@@ -49,20 +62,26 @@ jobs:
               {"name": "36氪", "rss": "https://36kr.com/feed", "className": "source-36kr"},
               {"name": "爱范儿", "rss": "https://www.ifanr.com/feed", "className": "source-ifanr"},
               {"name": "IT之家", "rss": "https://www.ithome.com/rss/", "className": "source-ithome"},
+              {"name": "钛媒体", "rss": "https://www.tmtpost.com/rss.xml", "className": "source-tmt"},
           ]
 
           all_news = []
           for src in sources:
               print(f"Fetching {src['name']}...")
               items = fetch_rss(src["rss"])
-              print(f"  Got {len(items)} items")
+              print(f"  Got {len(items)} items, filtering...")
               for item in items:
-                  item["source"] = src["name"]
-                  item["sourceClass"] = src["className"]
-                  all_news.append(item)
+                  combined = item["title"] + " " + item["summary"]
+                  if is_relevant(combined):
+                      item["source"] = src["name"]
+                      item["sourceClass"] = src["className"]
+                      all_news.append(item)
+                      print(f"    ✓ {item['title'][:40]}")
 
           all_news.sort(key=lambda x: x.get("pubDate", ""), reverse=True)
-          all_news = all_news[:12]
+          all_news = all_news[:15]
+
+          print(f"\nTotal relevant news: {len(all_news)}")
 
           # Read current HTML
           with open("index.html", "r", encoding="utf-8") as f:
@@ -81,7 +100,9 @@ jobs:
                   return '近期'
 
           def extract_tags(text):
-              keywords = ['外卖','美团','饿了么','抖音','科技','AI','政策','餐饮','电商','即时零售','直播','供应链','手机','芯片','苹果','PC','半导体','创业']
+              keywords = ['外卖','美团','饿了么','抖音','AI','人工智能','餐饮',
+                          '闪购','美团闪购','即时零售','本地生活','配送','骑手','商家',
+                          '京东外卖','饿了么外卖','奶茶','咖啡','生鲜','饿了么']
               tags = []
               for kw in keywords:
                   if kw in text and len(tags) < 2:
@@ -125,7 +146,9 @@ const newsData = [
 ];
 
 function extractTags(text) {{
-  const keywords = ['外卖','美团','饿了么','抖音','科技','AI','政策','餐饮','电商','即时零售','直播','供应链','手机','芯片','苹果','PC','半导体','创业'];
+  const keywords = ['外卖','美团','饿了么','抖音','AI','人工智能','餐饮',
+                     '闪购','美团闪购','即时零售','本地生活','配送','骑手','商家',
+                     '京东外卖','饿了么外卖','奶茶','咖啡','生鲜','饿了么'];
   const tags = [];
   for (const kw of keywords) {{
     if (text.includes(kw) && tags.length < 2) tags.push(kw);
@@ -137,7 +160,7 @@ function extractTags(text) {{
 function renderNews() {{
   const list = document.getElementById('newsList');
   if (newsData.length === 0) {{
-    list.innerHTML = '<div style="text-align:center;padding:40px;color:#999;font-size:14px;">暂无资讯</div>';
+    list.innerHTML = '<div style="text-align:center;padding:40px;color:#999;font-size:14px;">暂无相关资讯</div>';
     return;
   }}
 
