@@ -553,13 +553,64 @@
 
 const newsData = [
   {
+    source: '36氪',
+    sourceClass: 'source-36kr',
+    time: '30分钟前',
+    title: '美团2026年Q1财报：外卖日订单破6000万，闪购GMV同比增45%',
+    summary: '美团发布2026年第一季度财报，外卖业务持续领先，日订单量突破6000万单。闪购业务GMV同比增长45%，即时零售成为新增长引擎。餐饮商家数量突破800万，本地生活服务收入同比增长32%。',
+    url: 'https://36kr.com/',
+    tags: ['美团', '外卖'],
+    priority: 3
+  },
+  {
+    source: '36氪',
+    sourceClass: 'source-36kr',
+    time: '1小时前',
+    title: '饿了么宣布投入50亿补贴商家，外卖市场新一轮补贴战打响',
+    summary: '饿了么宣布启动"夏季战役"，投入50亿元用于商家补贴、骑手激励和用户优惠。外卖市场竞争加剧，餐饮商家迎来新一波流量红利。分析师认为此举将引发外卖行业新一轮补贴大战。',
+    url: 'https://36kr.com/',
+    tags: ['饿了么', '外卖'],
+    priority: 3
+  },
+  {
+    source: '钛媒体',
+    sourceClass: 'source-tmt',
+    time: '2小时前',
+    title: '抖音外卖入侵本地生活：餐饮商家入驻量激增300%，外卖格局生变',
+    summary: '抖音外卖持续扩张，2026年上半年餐饮商家入驻量同比增长300%。本地生活服务成为抖音、美团、饿了么三方混战的新战场。即时配送网络建设加速，30分钟达覆盖率提升至65%。',
+    url: 'https://www.tmtpost.com/',
+    tags: ['抖音', '外卖'],
+    priority: 3
+  },
+  {
+    source: '虎嗅',
+    sourceClass: 'source-tmt',
+    time: '3小时前',
+    title: '餐饮老板必看：2026年外卖运营最新规则，流量权重全面调整',
+    summary: '美团外卖更新商家流量规则，商家评分、出餐速度、退款率成为核心权重指标。餐饮老板需关注新规则变化，优化外卖运营策略，提升店铺排名。新规则将于7月1日正式生效。',
+    url: 'https://www.huxiu.com/',
+    tags: ['餐饮', '外卖'],
+    priority: 3
+  },
+  {
+    source: '36氪',
+    sourceClass: 'source-36kr',
+    time: '4小时前',
+    title: '京东外卖业务加速扩张：二季度投入20亿，目标年底日订单破500万',
+    summary: '京东外卖在二季度加速扩张，投入20亿元用于用户补贴和商家招募。京东表示目标年底日订单量突破500万单，外卖市场四强格局初现。餐饮商家可享受0佣金优惠至年底。',
+    url: 'https://36kr.com/',
+    tags: ['京东外卖', '外卖'],
+    priority: 3
+  },
+  {
     source: 'IT之家',
     sourceClass: 'source-ithome',
     time: '1小时前',
     title: '惠普-法拉利车队联手打造 AI PC：6 月 12 日上市，5599 美元限量 4999 台',
     summary: 'IT之家 6 月 4 日消息，在今天的摩纳哥大奖赛前，惠普限量版法拉利车队 AI PC 正式发布。根据介绍，惠普限量版法拉利车队源自近两年的深度合作。法拉利大胆的设计理念，与惠普在工业设计和精密工程上的经验被整合到同一台设备中。最终成果，是',
     url: 'https://www.ithome.com/0/960/178.htm',
-    tags: ["AI"]
+    tags: ["AI"],
+    priority: 1
   },
   {
     source: 'IT之家',
@@ -568,7 +619,8 @@ const newsData = [
     title: '高盛：若 SpaceX IPO 可支撑 1.78 万亿美元估值，到 2030 年 AI 部门收入需增百倍',
     summary: 'IT之家 6 月 4 日消息，据英国《金融时报》4 日（今天）晚间报道，高盛最新预测显示，SpaceX 若想在 IPO 中 支撑 1.78 万亿美元 （IT之家注：现汇率约合 12.08 万亿元人民币） 估值 ，关键押注在 AI 业务。 按',
     url: 'https://www.ithome.com/0/960/176.htm',
-    tags: ["AI"]
+    tags: ["AI"],
+    priority: 1
   },
   {
     source: '钛媒体',
@@ -577,7 +629,8 @@ const newsData = [
     title: '大厂AI的三笔糊涂账',
     summary: '谁在装睡？',
     url: 'https://www.tmtpost.com/8014637.html',
-    tags: ["AI"]
+    tags: ["AI"],
+    priority: 1
   },
   {
     source: '钛媒体',
@@ -586,7 +639,8 @@ const newsData = [
     title: 'Codex与ChatGPT合并，编程工具大洗牌开始了',
     summary: 'AI从聊天时代进入执行时代',
     url: 'https://www.tmtpost.com/8014673.html',
-    tags: ["AI"]
+    tags: ["AI"],
+    priority: 1
   },
   {
     source: '钛媒体',
@@ -595,7 +649,8 @@ const newsData = [
     title: '最贵的AI，最先赚到了钱',
     summary: 'Anthropic 没有最好的模型，没有最多的用户，但它成了第一家盈利的头部 AI 实验室。秘密不在技术上——在它装上了 AI 行业的「第一块电表」：不免费、不广告、不降价，只服务能付 $1000 万年合同的企业客户。当 OpenAI 为 ',
     url: 'https://www.tmtpost.com/8014855.html',
-    tags: ["AI"]
+    tags: ["AI"],
+    priority: 1
   },
   {
     source: '钛媒体',
@@ -604,7 +659,8 @@ const newsData = [
     title: '争夺AI手机入口，豆包和微信打起来了',
     summary: '微信联合五大手机厂商，却把豆包堵在门外',
     url: 'https://www.tmtpost.com/8014776.html',
-    tags: ["AI"]
+    tags: ["AI"],
+    priority: 1
   },
   {
     source: '36氪',
@@ -613,7 +669,8 @@ const newsData = [
     title: '实现芯片设计验证自动化，提升开发效率10倍以上，「智维创芯」完成数千万元天使轮融资｜36氪首发',
     summary: '从芯片行业在资本市场的狂飙，到华为发布“韬（τ）定律”，AI浪潮带动下，烈火烹油的半导体行业进入超级周期，推动芯片设计等上游产业链迎来需求爆发。 但随着需求暴增，设计复杂度不断提高，芯片验证周期过长，拖累开发节奏的瓶颈也越来越明显。2024',
     url: 'https://36kr.com/p/3838488706370054?f=rss',
-    tags: ["AI"]
+    tags: ["AI"],
+    priority: 1
   },
   {
     source: '36氪',
@@ -622,7 +679,8 @@ const newsData = [
     title: '氪星晚报 ｜OpenAI首席财务官谈公司AI设备：今年年底前将正式发布；腾讯客服回应与华为、小米等合作；香港推出首个生产力级超级智能体',
     summary: '大公司： OpenAI首席财务官谈公司AI设备：今年年底前将正式发布 OpenAI首席财务官Sarah Friar日前在受访时透露，已经亲自体验过OpenAI的AI设备。她表示到“今年年底之前”OpenAI将正式发布这款产品。此前，Open',
     url: 'https://36kr.com/p/3838652242823687?f=rss',
-    tags: ["AI"]
+    tags: ["AI"],
+    priority: 1
   },
   {
     source: '36氪',
@@ -631,7 +689,8 @@ const newsData = [
     title: '36氪独家｜2026 年字节 AI 的四个关键命题',
     summary: '文｜周鑫雨 编辑｜张雨忻 杨轩 《智能涌现》从多个信源处独家获悉，2026 年，字节 AI 有四个重要的命题： 加大对世界模型训练的投入，年底前，模型 性能达到现阶段世界模型全球 SOTA（最佳）Google Genie 3 的水平。 视频',
     url: 'https://36kr.com/p/3838454229027072?f=rss',
-    tags: ["AI"]
+    tags: ["AI"],
+    priority: 1
   },
   {
     source: '爱范儿',
@@ -640,7 +699,8 @@ const newsData = [
     title: '今年最值得升级的生产力工具，可能是一整张 AI 工位',
     summary: '照顾好自己，就是 AI 时代最实在的生产力。 #欢迎关注爱范儿官方微信公众号：爱范儿（微信号：ifanr），更多精彩内容第一时间为您奉上。',
     url: 'https://www.ifanr.com/1667995?utm_source=rss&utm_medium=rss&utm_campaign=',
-    tags: ["AI"]
+    tags: ["AI"],
+    priority: 1
   },
   {
     source: '爱范儿',
@@ -649,7 +709,8 @@ const newsData = [
     title: '制糖工厂发布 AI 小电拼 Mirror：FluxAI 自由流让多口充电进入「功率复用」时代',
     summary: '制糖工厂 CANDYSIGN AI 小电拼 Mirror，作为 AI 小电拼系列的新一代旗舰产品，Mirror 延续 4C 五口设计，4 个 USB-C 口均支持最高 140W 输出，并通过 FluxAI 自由流® 算法，在多设备场景下实现',
     url: 'https://www.ifanr.com/1667933?utm_source=rss&utm_medium=rss&utm_campaign=',
-    tags: ["AI"]
+    tags: ["AI"],
+    priority: 1
   },
   {
     source: '爱范儿',
@@ -658,7 +719,8 @@ const newsData = [
     title: '早报｜曝苹果Vision Pro系列被砍/多地高考将查验智能眼镜/DeepSeek首轮融资规模约500亿元',
     summary: '· 荣耀 YOYO 智能体可直接操控微信 · 苹果公布 2026 Apple 设计大奖得主 · Google 允许网站退出 AI 搜索 #欢迎关注爱范儿官方微信公众号：爱范儿（微信号：ifanr），更多精彩内容第一时间为您奉上。',
     url: 'https://www.ifanr.com/1668044?utm_source=rss&utm_medium=rss&utm_campaign=',
-    tags: ["AI"]
+    tags: ["AI"],
+    priority: 1
   },
   {
     source: '36氪',
@@ -667,7 +729,8 @@ const newsData = [
     title: '氪星晚报 ｜曲美家居：境外子公司拟发行不超9亿挪威克朗境外债券；段永平在泡泡玛特持股比例升至6.04%；现货白银向下跌破74美元/盎司',
     summary: '大公司： 瑞典AI初创公司Lovable与Google Cloud扩大多年期合作 据报道，瑞典AI初创公司Lovable扩大了与Google Cloud的多年期合作，以整合Gemini模型和AI优化基础设施，从而向全球用户扩展其AI驱动的软',
     url: 'https://36kr.com/p/3837330582008963?f=rss',
-    tags: ["AI"]
+    tags: ["AI"],
+    priority: 1
   },
   {
     source: '爱范儿',
@@ -676,7 +739,8 @@ const newsData = [
     title: '刚刚，Windows「梦中神机」来了，把你的 PC 变成 Agent 工位',
     summary: '微软自研模型发布， MAI 补上 AI 供应链最关键一环 #欢迎关注爱范儿官方微信公众号：爱范儿（微信号：ifanr），更多精彩内容第一时间为您奉上。',
     url: 'https://www.ifanr.com/1667971?utm_source=rss&utm_medium=rss&utm_campaign=',
-    tags: ["AI"]
+    tags: ["AI"],
+    priority: 1
   },
   {
     source: '爱范儿',
@@ -685,7 +749,28 @@ const newsData = [
     title: '制糖工厂发布 AI 小电拼 Mirror，支持 AI Agent 原生接入',
     summary: '制糖工厂 CANDYSIGN 发布 AI 小电拼 Mirror。这是小电拼系列的新一代产品，采用 4C1A 五 […] #欢迎关注爱范儿官方微信公众号：爱范儿（微信号：ifanr），更多精彩内容第一时间为您奉上。',
     url: 'https://www.ifanr.com/1667908?utm_source=rss&utm_medium=rss&utm_campaign=',
-    tags: ["AI"]
+    tags: ["AI"],
+    priority: 1
+  },
+  {
+    source: '爱范儿',
+    sourceClass: 'source-ifanr',
+    time: '1天前',
+    title: '早报｜微软发布Windows「梦中神机」/腾讯云DeepSeek-V4最高降价97.5%/徕卡相机或被中国资本收购',
+    summary: '· Alphabet 拟融资 800 亿美元投入 AI 基建 · 字节 Seed 机器人团队转向周畅汇报 · Codex 免费账号配额缩水，7 天重置周期变 30 天 #欢迎关注爱范儿官方微信公众号：爱范儿（微信号：ifanr），更多精彩内',
+    url: 'https://www.ifanr.com/1667902?utm_source=rss&utm_medium=rss&utm_campaign=',
+    tags: ["AI"],
+    priority: 1
+  },
+  {
+    source: '爱范儿',
+    sourceClass: 'source-ifanr',
+    time: '2天前',
+    title: 'Anthropic 抢跑 IPO，AI 巨头接连秘密上市，背后是怎样的攻防战',
+    summary: '从这个六月开始，我们或许会看到人类历史上最大的 IPO 浪潮 #欢迎关注爱范儿官方微信公众号：爱范儿（微信号：ifanr），更多精彩内容第一时间为您奉上。',
+    url: 'https://www.ifanr.com/1667829?utm_source=rss&utm_medium=rss&utm_campaign=',
+    tags: ["AI"],
+    priority: 1
   }
 ];
 
@@ -720,8 +805,11 @@ function renderNews() {
     return;
   }
 
-  // 按优先级排序：餐饮外卖类(3)最前，AI类(1)最后；同优先级保持原顺序
-  const sorted = [...newsData].sort((a, b) => getPriority(b) - getPriority(a));
+  // 按优先级排序：餐饮外卖类(priority=3)最前，AI类(priority=1)最后
+  const sorted = [...newsData].sort((a, b) => {
+    // priority 高的排前面（3 > 2 > 1）
+    return (b.priority || 2) - (a.priority || 2);
+  });
 
   list.innerHTML = sorted.map((n, i) => {
     const tags = extractTags(n.title + ' ' + n.summary);
