@@ -701,6 +701,18 @@ function extractTags(text) {
   return tags;
 }
 
+function getPriority(item) {
+  const text = (item.title || '') + ' ' + (item.summary || '');
+  const high = ['外卖','美团','饿了么','餐饮','餐厅','饭店','奶茶','咖啡',
+                '快餐','生鲜','闪购','美团闪购','即时零售','本地生活',
+                '配送','骑手','商家','外卖平台','美团外卖','饿了么外卖',
+                '京东外卖','外卖员','众包','专送','拼好饭','饿了么','饿了么星选','抖音外卖'];
+  const low  = ['AI','人工智能','抖音'];
+  for (const kw of high) if (text.includes(kw)) return 3;
+  for (const kw of low)  if (text.includes(kw)) return 1;
+  return 2;
+}
+
 function renderNews() {
   const list = document.getElementById('newsList');
   if (newsData.length === 0) {
@@ -708,7 +720,10 @@ function renderNews() {
     return;
   }
 
-  list.innerHTML = newsData.map((n, i) => {
+  // 按优先级排序：餐饮外卖类(3)最前，AI类(1)最后；同优先级保持原顺序
+  const sorted = [...newsData].sort((a, b) => getPriority(b) - getPriority(a));
+
+  list.innerHTML = sorted.map((n, i) => {
     const tags = extractTags(n.title + ' ' + n.summary);
     return `
     <div class="news-card" onclick="window.open(n.url, '_blank')" style="cursor:pointer;">

@@ -32,6 +32,23 @@ jobs:
               '外卖员', '众包', '专送', '拼好饭', '饿了么星选'
           ]
 
+          # 优先级分组：越高越靠前
+          PRIORITY_HIGH = ['外卖','美团','饿了么','餐饮','餐厅','饭店','奶茶','咖啡',
+                           '快餐','生鲜','闪购','美团闪购','即时零售','本地生活',
+                           '配送','骑手','商家','外卖平台','美团外卖','饿了么外卖',
+                           '京东外卖','外卖员','众包','专送','拼好饭','饿了么','饿了么星选','抖音外卖']
+          PRIORITY_LOW  = ['AI', '人工智能', '抖音']
+
+          def get_priority(text):
+              """餐饮/外卖类=3，其他=2，AI类=1"""
+              for kw in PRIORITY_HIGH:
+                  if kw in text:
+                      return 3
+              for kw in PRIORITY_LOW:
+                  if kw in text:
+                      return 1
+              return 2
+
           def is_relevant(text):
               return any(kw in text for kw in KEYWORDS)
 
@@ -75,10 +92,13 @@ jobs:
                   if is_relevant(combined):
                       item["source"] = src["name"]
                       item["sourceClass"] = src["className"]
+                      item["priority"] = get_priority(combined)
                       all_news.append(item)
                       print(f"    ✓ {item['title'][:40]}")
 
+          # 按优先级排序：餐饮外卖类(priority=3)最前，AI类(priority=1)最后；同优先级按时间倒序（最新在前）
           all_news.sort(key=lambda x: x.get("pubDate", ""), reverse=True)
+          all_news.sort(key=lambda x: x.get("priority", 2), reverse=True)
           all_news = all_news[:15]
 
           print(f"\nTotal relevant news: {len(all_news)}")
@@ -125,7 +145,8 @@ jobs:
     title: '{title_escaped}',
     summary: '{summary_escaped}',
     url: '{url_escaped}',
-    tags: {json.dumps(tags, ensure_ascii=False)}
+    tags: {json.dumps(tags, ensure_ascii=False)},
+    priority: {item.get('priority', 2)}
   }}""")
 
           news_array = ',\n'.join(news_lines)
