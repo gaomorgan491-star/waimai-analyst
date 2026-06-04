@@ -548,69 +548,67 @@
 
 <script>
 // ===== DATA =====
-// ===== REAL NEWS: fetch from RSS feeds via allorigins proxy =====
+// ===== REAL NEWS: fetch from RSS feeds via rss2json (parallel) =====
 const RSS_SOURCES = [
   { name: '36氪', rss: 'https://36kr.com/feed', className: 'source-36kr' },
-  { name: '虎嗅', rss: 'https://www.huxiu.com/rss/0.xml', className: 'source-huxiu' },
   { name: '爱范儿', rss: 'https://www.ifanr.com/feed', className: 'source-ifanr' },
-  { name: '腾讯科技', rss: 'https://tech.qq.com/rss.xml', className: 'source-qq' }
+  { name: 'IT之家', rss: 'https://www.ithome.com/rss/', className: 'source-ithome' },
+  { name: '少数派', rss: 'https://feeds.feedburner.com/playpcesor', className: 'source-sspai' }
 ];
 
 async function fetchNews() {
-  const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
+  const API = 'https://api.rss2json.com/v1/api.json?rss_url=';
   const allNews = [];
 
-  for (const src of RSS_SOURCES) {
-    try {
-      const res = await fetch(CORS_PROXY + encodeURIComponent(src.rss), { signal: AbortSignal.timeout(8000) });
-      if (!res.ok) continue;
-      const text = await res.text();
-      const xml = new DOMParser().parseFromString(text, 'text/xml');
-      const items = xml.querySelectorAll('item, entry');
-      for (let i = 0; i < Math.min(items.length, 4); i++) {
-        const item = items[i];
-        let title = item.querySelector('title')?.textContent || '';
-        let link = item.querySelector('link')?.textContent || item.querySelector('link')?.getAttribute('href') || '';
-        const pubDate = item.querySelector('pubDate, published, updated')?.textContent || '';
-        let desc = item.querySelector('description, summary, content')?.textContent || '';
-        if (!title) continue;
-        // Clean up title
-        title = title.replace(/<!\[CDATA\[|]]>|\s+/g, ' ').trim();
-        // Clean up description
-        desc = desc.replace(/<!\[CDATA\[|]]>|<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-        const timeStr = formatTime(pubDate);
-        allNews.push({
-          source: src.name,
-          sourceClass: src.className,
-          time: timeStr,
-          title: title,
-          summary: desc.slice(0, 100) + (desc.length > 100 ? '...' : ''),
-          url: link
-        });
-      }
-    } catch(e) {
-      console.warn('Failed to fetch ' + src.name + ':', e.message);
-    }
+  // Fetch all feeds in parallel for speed
+  const results = await Promise.allSettled(
+    RSS_SOURCES.map(src =>
+      fetch(API + encodeURIComponent(src.rss), { signal: AbortSignal.timeout(6000) })
+        .then(r => r.json())
+        .then(data => {
+          if (data.status !== 'ok' || !data.items) return [];
+          return data.items.slice(0, 4).map(item => ({
+            source: src.name,
+            sourceClass: src.className,
+            time: formatTime(item.pubDate),
+            title: (item.title || '').replace(/<[^>]+>/g, '').trim(),
+            summary: (item.description || item.title || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 100),
+            url: item.link || '',
+            _ts: item.pubDate ? new Date(item.pubDate).getTime() : 0
+          }));
+        })
+        .catch(() => [])
+    )
+  );
+
+  for (const r of results) {
+    if (r.status === 'fulfilled' && r.value) allNews.push(...r.value);
   }
 
-  // Sort by time (most recent first)
-  allNews.sort((a, b) => {
-    try { return new Date(b._ts || 0) - new Date(a._ts || 0); } catch(e) { return 0; }
-  });
-  return allNews.slice(0, 10);
+  allNews.sort((a, b) => (b._ts || 0) - (a._ts || 0));
+  return allNews.slice(0, 12);
 }
 
 function formatTime(dateStr) {
   try {
     const d = new Date(dateStr);
     if (isNaN(d)) return '近期';
-    const now = new Date();
-    const diff = (now - d) / 1000;
+    const diff = (Date.now() - d) / 1000;
     if (diff < 60) return '刚刚';
     if (diff < 3600) return Math.floor(diff/60) + '分钟前';
     if (diff < 86400) return Math.floor(diff/3600) + '小时前';
     return Math.floor(diff/86400) + '天前';
   } catch(e) { return '近期'; }
+}
+
+function extractTags(text) {
+  const keywords = ['外卖','美团','饿了么','抖音','科技','AI','政策','餐饮','电商','即时零售','直播','供应链','手机','芯片','苹果'];
+  const tags = [];
+  for (const kw of keywords) {
+    if (text.includes(kw) && tags.length < 2) tags.push(kw);
+  }
+  if (tags.length === 0) tags.push('行业资讯');
+  return tags;
 }
 
 async function renderNews() {
@@ -640,16 +638,6 @@ async function renderNews() {
       </div>
     </div>
   `).join('');
-}
-
-function extractTags(text) {
-  const keywords = ['外卖','美团','饿了么','抖音','科技','AI','政策','餐饮','电商','即时零售','直播','供应链','饿了么','美团外卖','抖音外卖'];
-  const tags = [];
-  for (const kw of keywords) {
-    if (text.includes(kw) && tags.length < 2) tags.push(kw);
-  }
-  if (tags.length === 0) tags.push('行业资讯');
-  return tags;
 }
 
 
