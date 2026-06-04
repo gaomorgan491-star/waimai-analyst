@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>外卖分析师工作平台</title>
+  <style>
+    :root {
+      --primary: #E2382E;
+      --primary-dark: #C42A22;
+      --primary-light: #FF6B5E;
+      --accent: #FF9800;
+      --bg: #F5F6FA;
+      --card: #FFFFFF;
+      --text: #1A1A2E;
+      --text-secondary: #6B7280;
+      --border: #E5E7EB;
+      --shadow: 0 2px 12px rgba(0,0,0,0.08);
+      --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
+      --radius: 16px;
+      --radius-sm: 10px;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    /* ===== Header ===== */
+    .header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: #fff;
+      padding: 20px 24px 60px;
+      position: relative;
+      overflow: hidden;
+    }
+    .header::after {
+      content: '';
+      position: absolute;
+      bottom: -40px;
+      left: 0; right: 0;
+      height: 80px;
+      background: var(--bg);
+      border-radius: 50% 50% 0 0;
+    }
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .jd-dog {
+      width: 48px;
+      height: 48px;
+      background: #fff;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .app-title {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+    .app-subtitle {
+      font-size: 12px;
+      opacity: 0.85;
+      margin-top: 2px;
+    }
+    .header-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .header-btn {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: #fff;
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      font-size: 16px;
+      cursor: pointer;
+      backdrop-filter: blur(4px);
+      transition: background 0.2s;
+    }
+    .header-btn:hover { background: rgba(255,255,255,0.35); }
+    /* ===== Stats Bar ===== */
+    .stats-bar {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px;
+      padding: 0 4px;
+    }
+    .stat-item {
+      flex: 1;
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(8px);
+      border-radius: 12px;
+      padding: 12px 10px;
+      text-align: center;
+    }
+    .stat-value { font-size: 22px; font-weight: 700; }
+    .stat-label { font-size: 11px; opacity: 0.8; margin-top: 2px; }
+
+    /* ===== Main Content ===== */
+    .main {
+      padding: 0 16px 90px;
+      margin-top: -30px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ===== Tab Navigation ===== */
+    .tab-nav {
+      display: flex;
+      background: var(--card);
+      border-radius: 14px;
+      padding: 5px;
+      box-shadow: var(--shadow);
+      margin-bottom: 18px;
+    }
+    .tab-btn {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 12px 6px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+    .tab-btn.active {
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(226,56,46,0.3);
+    }
+    .tab-btn:not(.active):hover { background: #f3f4f6; }
+
+    /* ===== Tab Content ===== */
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* ===== Section Title ===== */
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-title .icon { font-size: 20px; }
+
+    /* ===== News Cards ===== */
+    .news-list { display: flex; flex-direction: column; gap: 12px; }
+    .news-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .news-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+    .news-card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .news-source {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+      color: #fff;
+    }
+    .source-hongcan { background: #E53935; }
+    .source-toutiao { background: #F44336; }
+    .source-36kr { background: #009688; }
+    .source-ifeng { background: #FF6F00; }
+    .source-waimai { background: var(--primary); }
+    .source-keji { background: #1976D2; }
+    .news-time { font-size: 12px; color: var(--text-secondary); }
+    .news-title { font-size: 15px; font-weight: 600; line-height: 1.5; margin-bottom: 6px; }
+    .news-summary { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+    .news-tags { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+    .news-tag {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: #FEF2F2;
+      color: var(--primary);
+    }
+
+    /* ===== Knowledge Base ===== */
+    .kb-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .kb-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 20px 16px;
+      box-shadow: var(--shadow);
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .kb-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+    .kb-icon { font-size: 36px; margin-bottom: 10px; }
+    .kb-name { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+    .kb-count { font-size: 12px; color: var(--text-secondary); }
+
+    .kb-detail {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow);
+      margin-top: 14px;
+    }
+    .kb-detail-title {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .kb-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid #f3f4f6;
+      cursor: pointer;
+    }
+    .kb-item:last-child { border-bottom: none; }
+    .kb-item:hover { background: #fafafa; }
+    .kb-item-icon { font-size: 20px; }
+    .kb-item-text { flex: 1; }
+    .kb-item-title { font-size: 14px; font-weight: 500; }
+    .kb-item-desc { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+    .kb-item-arrow { color: #ccc; font-size: 14px; }
+
+    /* ===== Quiz Section ===== */
+    .quiz-categories { display: flex; flex-direction: column; gap: 12px; }
+    .quiz-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .quiz-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+    .quiz-card-top { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+    .quiz-emoji { font-size: 32px; }
+    .quiz-info { flex: 1; }
+    .quiz-name { font-size: 15px; font-weight: 600; }
+    .quiz-desc { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+    .quiz-progress-bar {
+      height: 6px;
+      background: #eee;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .quiz-progress-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      transition: width 0.5s;
+    }
+    .quiz-meta {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    /* ===== Quiz Modal ===== */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top:0;left:0;right:0;bottom:0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      background: #fff;
+      border-radius: var(--radius);
+      width: 100%;
+      max-width: 500px;
+      max-height: 80vh;
+      overflow-y: auto;
+      padding: 24px;
+    }
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .modal-title { font-size: 18px; font-weight: 700; }
+    .modal-close {
+      border: none;
+      background: #f3f4f6;
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .quiz-question {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      line-height: 1.6;
+    }
+    .quiz-options { display: flex; flex-direction: column; gap: 10px; }
+    .quiz-option {
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: #fff;
+      text-align: left;
+    }
+    .quiz-option:hover { border-color: var(--primary-light); background: #FFF5F5; }
+    .quiz-option.correct { border-color: #4CAF50; background: #E8F5E9; }
+    .quiz-option.wrong { border-color: #F44336; background: #FFEBEE; }
+    .quiz-option.selected { border-color: var(--primary); background: #FFF5F5; }
+    .quiz-result {
+      text-align: center;
+      padding: 20px;
+    }
+    .quiz-result-icon { font-size: 48px; margin-bottom: 12px; }
+    .quiz-result-text { font-size: 16px; font-weight: 600; }
+    .quiz-result-score { font-size: 36px; font-weight: 700; color: var(--primary); margin: 10px 0; }
+    .quiz-btn {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 12px 28px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .quiz-btn:hover { background: var(--primary-dark); }
+
+    /* ===== Article Modal ===== */
+    .article-content { line-height: 1.8; font-size: 14px; color: #333; }
+    .article-content p { margin-bottom: 12px; }
+    .article-meta { font-size: 12px; color: var(--text-secondary); margin-bottom: 16px; }
+
+    /* ===== Bottom Navigation ===== */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0; right: 0;
+      background: #fff;
+      border-top: 1px solid var(--border);
+      display: flex;
+      padding: 8px 0;
+      padding-bottom: calc(8px + env(safe-area-inset-bottom));
+      z-index: 100;
+    }
+    .nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      padding: 6px;
+      border: none;
+      background: none;
+      cursor: pointer;
+      color: var(--text-secondary);
+      font-size: 11px;
+      transition: color 0.2s;
+    }
+    .nav-item.active { color: var(--primary); }
+    .nav-item .nav-icon { font-size: 22px; }
+
+    /* ===== Refresh indicator ===== */
+    .refresh-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px;
+      margin-bottom: 14px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      background: var(--card);
+      border-radius: 10px;
+    }
+    .refresh-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #4CAF50;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* ===== Scrollbar ===== */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #ddd; border-radius: 2px; }
+
+    /* ===== Responsive ===== */
+    @media (min-width: 600px) {
+      .main { max-width: 540px; margin-left: auto; margin-right: auto; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-top">
+    <div class="logo-area">
+      <div class="jd-dog">🐶</div>
+      <div>
+        <div class="app-title">外卖分析师工作平台</div>
+        <div class="app-subtitle">Waimai Analyst Workspace</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="header-btn" onclick="refreshNews()" title="刷新">🔄</button>
+      <button class="header-btn" title="搜索">🔍</button>
+    </div>
+  </div>
+  <div class="stats-bar">
+    <div class="stat-item">
+      <div class="stat-value" id="newsCount">128</div>
+      <div class="stat-label">今日资讯</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">36</div>
+      <div class="stat-label">知识条目</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">89</div>
+      <div class="stat-label">题库题目</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">5</div>
+      <div class="stat-label">数据源</div>
+    </div>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="main">
+  <!-- Tab Navigation -->
+  <div class="tab-nav">
+    <button class="tab-btn active" data-tab="news">📰 行业动态</button>
+    <button class="tab-btn" data-tab="knowledge">📚 知识库</button>
+    <button class="tab-btn" data-tab="quiz">🧠 题库</button>
+  </div>
+
+  <!-- ===== NEWS TAB ===== -->
+  <div class="tab-content active" id="tab-news">
+    <div class="refresh-bar">
+      <span class="refresh-dot"></span>
+      <span>实时更新中 · 最后刷新 <span id="lastRefresh">刚刚</span></span>
+    </div>
+    <div class="news-list" id="newsList"></div>
+  </div>
+
+  <!-- ===== KNOWLEDGE TAB ===== -->
+  <div class="tab-content" id="tab-knowledge">
+    <div class="section-title"><span class="icon">📂</span> 知识分类</div>
+    <div class="kb-grid" id="kbGrid"></div>
+    <div id="kbDetail" style="display:none"></div>
+  </div>
+
+  <!-- ===== QUIZ TAB ===== -->
+  <div class="tab-content" id="tab-quiz">
+    <div class="section-title"><span class="icon">🎯</span> 分析工具题库</div>
+    <div class="quiz-categories" id="quizList"></div>
+  </div>
+</div>
+
+<!-- Quiz Modal -->
+<div class="modal-overlay" id="quizModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="quizModalTitle">答题</div>
+      <button class="modal-close" onclick="closeQuizModal()">✕</button>
+    </div>
+    <div id="quizModalBody"></div>
+  </div>
+</div>
+
+<!-- Article Modal -->
+<div class="modal-overlay" id="articleModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="articleModalTitle">文章</div>
+      <button class="modal-close" onclick="closeArticleModal()">✕</button>
+    </div>
+    <div id="articleModalBody"></div>
+  </div>
+</div>
+
+<!-- Bottom Navigation -->
+<div class="bottom-nav">
+  <button class="nav-item active" data-tab="news">
+    <span class="nav-icon">📰</span>
+    <span>动态</span>
+  </button>
+  <button class="nav-item" data-tab="knowledge">
+    <span class="nav-icon">📚</span>
+    <span>知识</span>
+  </button>
+  <button class="nav-item" data-tab="quiz">
+    <span class="nav-icon">🧠</span>
+    <span>题库</span>
+  </button>
+</div>
+
+<script>
+// ===== DATA =====
+const newsData = [
+  {
+    source: '红餐网', sourceClass: 'source-hongcan',
+    time: '10分钟前',
+    title: '2026年外卖行业半年报：市场规模突破1.8万亿，三四线城市增速领跑',
+    summary: '据最新数据统计，2026年上半年中国外卖市场规模达到1.82万亿元，同比增长18.3%。三四线城市订单量增速达32%，远超一线城市的12%...',
+    tags: ['行业报告', '市场规模'],
+    content: '据最新数据统计，2026年上半年中国外卖市场规模达到1.82万亿元，同比增长18.3%。\n\n其中，三四线城市订单量增速达32%，远超一线城市的12%。美团外卖占比约67%，饿了么占比约28%，其他平台占比约5%。\n\n值得关注的是，即时零售（买菜、药品等）增速高达45%，成为行业新增长引擎。夜间外卖订单（22:00-06:00）同比增长26%，反映出消费习惯的持续改变。'
+  },
+  {
+    source: '今日头条', sourceClass: 'source-toutiao',
+    time: '25分钟前',
+    title: '美团发布"智能调度3.0"系统，骑手平均配送时长再降3分钟',
+    summary: '美团外卖正式发布智能调度3.0系统，通过深度学习优化配送路径，预计全国骑手平均每单配送时长缩短3分钟，商家出餐效率提升15%...',
+    tags: ['美团', '智能调度'],
+    content: '美团外卖正式发布智能调度3.0系统，这是继2024年2.0版本后的重大升级。\n\n新系统基于深度强化学习算法，能够实时处理超过100万个订单的路径规划。核心改进包括：\n\n1. 骑手平均每单配送时长缩短3分钟\n2. 商家出餐效率提升15%\n3. 用户等待时长减少8%\n4. 异常订单处理速度提升40%\n\n美团技术负责人表示，3.0系统还能根据天气、交通等外部因素进行动态调整。'
+  },
+  {
+    source: '36氪', sourceClass: 'source-36kr',
+    time: '1小时前',
+    title: '抖音外卖加速扩张：日订单突破1500万，本地生活战局升级',
+    summary: '据36氪获悉，抖音外卖日订单量已突破1500万单，较去年同期增长200%。抖音正在通过直播+外卖的模式重构本地生活服务...',
+    tags: ['抖音外卖', '本地生活'],
+    content: '据36氪获悉，抖音外卖日订单量已突破1500万单，较去年同期增长200%，成为继美团、饿了么之后的第三大外卖平台。\n\n抖音外卖的核心差异化在于"直播+外卖"模式：用户在观看美食直播时可直接下单，转化率是传统搜索下单的3.2倍。\n\n目前抖音外卖已覆盖全国280个城市，合作商家超过120万家。下一步将重点发力下沉市场和即时零售。'
+  },
+  {
+    source: '红餐网', sourceClass: 'source-hongcan',
+    time: '2小时前',
+    title: '餐饮品牌外卖化率创新高：连锁品牌线上占比超65%',
+    summary: '红餐网调研数据显示，全国TOP100连锁餐饮品牌的外卖化率已超过65%，其中茶饮品类外卖占比最高达78%...',
+    tags: ['连锁品牌', '外卖化率'],
+    content: '红餐网最新调研数据显示，全国TOP100连锁餐饮品牌的外卖化率已超过65%，较2024年提升8个百分点。\n\n各品类外卖化率：\n- 茶饮：78%\n- 快餐便当：72%\n- 火锅烧烤：45%\n- 正餐：38%\n\n分析认为，外卖化率持续提升的原因包括：消费者习惯改变、平台佣金优化、品牌数字化能力提升。'
+  },
+  {
+    source: '凤凰网科技', sourceClass: 'source-ifeng',
+    time: '3小时前',
+    title: '饿了么"百亿补贴"重启，剑指下沉市场与即时零售',
+    summary: '饿了么宣布重启"百亿补贴"计划，重点投入下沉市场和即时零售领域。分析人士认为，此举旨在应对抖音外卖的快速崛起...',
+    tags: ['饿了么', '百亿补贴'],
+    content: '饿了么宣布重启"百亿补贴"计划，这是继2023年首次百亿补贴后的第二次大规模补贴行动。\n\n本次补贴计划重点包括：\n1. 下沉市场新用户首单立减15元\n2. 即时零售（买菜、药品）满减力度翻倍\n3. 会员权益升级：月卡用户专享红包\n\n分析人士认为，饿了么此举一方面应对抖音外卖的快速崛起，另一方面也在为阿里本地生活板块的独立上市做准备。'
+  },
+  {
+    source: '外卖资讯', sourceClass: 'source-waimai',
+    time: '4小时前',
+    title: '骑手权益保障新规落地：多地推出"骑手驿站"与社保试点',
+    summary: '人社部联合多部门推出外卖骑手权益保障新措施，包括在主要城市设置骑手驿站、试点骑手社保缴纳方案等...',
+    tags: ['骑手权益', '政策法规'],
+    content: '人社部联合多部门推出外卖骑手权益保障新措施，覆盖全国50个主要城市。\n\n主要措施包括：\n1. 骑手驿站：在商圈、社区设置休息站点，提供饮水、充电、休息服务\n2. 社保试点：在北京、上海、深圳等10城试点骑手社保缴纳方案\n3. 安全保障：强制配备智能头盔，AI疲劳驾驶预警\n4. 收入保障：恶劣天气补贴翻倍，超时免罚范围扩大\n\n目前全国注册外卖骑手超过1300万人，这一政策预计将惠及超800万全职骑手。'
+  },
+  {
+    source: '科技日报', sourceClass: 'source-keji',
+    time: '5小时前',
+    title: 'AI厨房时代来临：智能炒菜机+外卖模式正在重塑餐饮供应链',
+    summary: '多家餐饮连锁品牌引入AI智能炒菜机，配合外卖配送模式，实现"无人厨房"运营，成本降低40%的同时保证出品一致性...',
+    tags: ['AI厨房', '智能餐饮'],
+    content: '随着AI技术和机器人技术的成熟，智能炒菜机正在快速进入餐饮行业。\n\n目前已有超过5000家门店引入AI智能炒菜机，主要应用场景包括：\n\n1. 连锁快餐品牌：标准化出品，成本降低40%\n2. 外卖云厨房：24小时运营，人力成本降低60%\n3. 企业团餐：大锅菜智能烹饪，效率提升3倍\n\n行业专家预测，到2028年，AI厨房将覆盖30%的外卖门店，成为餐饮行业的标配。'
+  },
+  {
+    source: '今日头条', sourceClass: 'source-toutiao',
+    time: '6小时前',
+    title: '外卖包装绿色革命：可降解餐盒渗透率突破40%，成本持续下降',
+    summary: '随着环保政策收紧和材料技术进步，可降解外卖餐盒的市场渗透率已突破40%，单价降至传统塑料餐盒的1.3倍...',
+    tags: ['绿色外卖', '环保包装'],
+    content: '根据中国包装联合会数据，可降解外卖餐盒的市场渗透率已从2024年的22%提升至2026年的40%。\n\n推动因素包括：\n1. 限塑令全面实施，传统塑料餐盒面临淘汰\n2. PLA等可降解材料成本下降35%\n3. 美团、饿了么等平台推出绿色包装补贴\n4. 消费者环保意识提升，62%用户愿意为环保包装多付1元\n\n预计到2027年，可降解餐盒渗透率将超过60%，成为行业主流。'
+  }
+];
+
+const knowledgeData = [
+  {
+    icon: '🏗️', name: '平台运营', count: 12,
+    items: [
+      { icon: '📊', title: '美团商家运营手册', desc: '从入驻到爆单的完整方法论' },
+      { icon: '🔑', title: '饿了么流量获取策略', desc: '搜索排名与活动运营技巧' },
+      { icon: '📱', title: '抖音外卖直播运营', desc: '直播话术与转化率提升' },
+      { icon: '💰', title: '满减与定价策略', desc: '科学的满减设置方法' },
+      { icon: '⭐', title: '评价管理体系', desc: '差评处理与好评引导' },
+      { icon: '🏷️', title: '平台活动报名指南', desc: '大促活动参与全攻略' }
+    ]
+  },
+  {
+    icon: '📦', name: '供应链管理', count: 8,
+    items: [
+      { icon: '🏭', title: '中央厨房建设指南', desc: '标准化与成本控制' },
+      { icon: '🚚', title: '冷链物流管理', desc: '食品安全与配送效率' },
+      { icon: '📋', title: '食材采购成本优化', desc: '供应链降本增效方法' },
+      { icon: '🔬', title: '菜品标准化SOP', desc: '口味一致性与出品速度' }
+    ]
+  },
+  {
+    icon: '📈', name: '数据分析', count: 9,
+    items: [
+      { icon: '📉', title: '外卖数据看板搭建', desc: '核心指标体系与可视化' },
+      { icon: '🎯', title: '用户画像分析方法', desc: '精准营销与复购提升' },
+      { icon: '🗺️', title: '商圈分析工具使用', desc: '选址与竞争分析' },
+      { icon: '📊', title: 'ROI计算与优化', desc: '投入产出比分析方法' },
+      { icon: '🔮', title: '销售预测模型', desc: '备货与排班数据支撑' }
+    ]
+  },
+  {
+    icon: '⚖️', name: '政策法规', count: 7,
+    items: [
+      { icon: '📜', title: '外卖食品安全法规', desc: '食安合规要点解读' },
+      { icon: '👷', title: '骑手劳动权益保障', desc: '最新政策与合规要求' },
+      { icon: '🌳', title: '环保包装政策解读', desc: '限塑令与绿色转型' },
+      { icon: '📝', title: '商家资质与许可', desc: '入驻合规要求全览' }
+    ]
+  }
+];
+
+const quizData = [
+  {
+    emoji: '📊', name: '数据分析基础', desc: 'Excel与数据看板技能', total: 10, progress: 30,
+    questions: [
+      { q: '在外卖数据分析中，以下哪个指标最能反映用户忠诚度？', options: ['日订单量', '复购率', '客单价', '转化率'], answer: 1 },
+      { q: 'ROI的计算公式是？', options: ['收入/成本', '利润/收入', '(收入-成本)/成本', '成本/收入'], answer: 2 },
+      { q: '外卖行业的"抽成率"通常是指？', options: ['平台收取的固定费用', '平台从每笔订单中提取的佣金比例', '商家支付的广告费', '骑手的配送费分成'], answer: 1 },
+      { q: '以下哪个不是外卖运营的核心漏斗指标？', options: ['曝光量', '进店率', '下单率', '员工满意度'], answer: 3 },
+      { q: 'A/B测试在外卖运营中的主要作用是？', options: ['提高配送速度', '对比不同策略的效果', '减少食材浪费', '优化骑手路线'], answer: 1 },
+      { q: '外卖数据看板中，"同店同比增长"的计算方式是？', options: ['(本期-上期)/上期×100%', '本期/上期×100%', '(本期-上期)/本期×100%', '上期/本期×100%'], answer: 0 },
+      { q: '以下哪种图表最适合展示外卖订单的时间分布？', options: ['饼图', '折线图', '散点图', '雷达图'], answer: 1 },
+      { q: '外卖商家"有效曝光"的定义是？', options: ['搜索结果中的展示次数', '用户实际看到并停留的展示', '广告投放的展示量', '首页推荐的展示次数'], answer: 1 },
+      { q: '客单价的计算公式是？', options: ['总利润/订单数', '总营收/订单数', '总营收/用户数', '总利润/用户数'], answer: 1 },
+      { q: '以下哪个指标可以判断外卖店铺的健康度？', options: ['每日营业时长', '评分与复购率', '菜单数量', '配送范围大小'], answer: 1 }
+    ]
+  },
+  {
+    emoji: '🏪', name: '平台运营实务', desc: '美团、饿了么运营技巧', total: 10, progress: 10,
+    questions: [
+      { q: '美团外卖商家的"星级评分"最低为几分？', options: ['1分', '2分', '3分', '4分'], answer: 2 },
+      { q: '以下哪种满减策略最有利于提高客单价？', options: ['满20减5', '满30减8', '满50减15', '满80减20'], answer: 2 },
+      { q: '饿了么"超级会员"对商家的核心价值是？', options: ['免费流量', '提高搜索排名', '增加用户复购', '降低佣金费率'], answer: 2 },
+      { q: '外卖店铺的"商圈分析"首先应该关注什么？', options: ['竞争对手数量', '目标客群密度', '配送费水平', '平台补贴力度'], answer: 1 },
+      { q: '以下哪种方式不能有效提高外卖店铺的搜索排名？', options: ['优化菜品名称关键词', '提高店铺评分', '增加刷单量', '参与平台活动'], answer: 2 },
+      { q: '外卖新店"冷启动"的最佳策略是？', options: ['大幅降价', '配合平台新店扶持+精准投放', '大量铺设广告', '延长营业时间'], answer: 1 },
+      { q: '美团外卖的"一口价"配送费模式对商家的影响是？', options: ['降低配送成本', '配送费固定，降低不确定性', '增加平台收入', '提高用户下单率'], answer: 1 },
+      { q: '外卖店铺差评的最佳处理时间是？', options: ['24小时内', '2小时内', '1小时内', '48小时内'], answer: 1 },
+      { q: '以下哪个不是影响外卖店铺曝光量的因素？', options: ['店铺评分', '配送速度', '菜单图片质量', '商家注册时间'], answer: 3 },
+      { q: '外卖"品类渗透率"的含义是？', options: ['某品类在所有外卖中的占比', '某品类目标用户的覆盖比例', '某品类商家的开店率', '某品类的利润率'], answer: 1 }
+    ]
+  },
+  {
+    emoji: '🧮', name: '成本与利润分析', desc: '外卖财务分析技能', total: 8, progress: 0,
+    questions: [
+      { q: '外卖商家的"综合费率"通常包含哪些费用？', options: ['平台佣金+配送费', '平台佣金+支付手续费', '食材成本+包装费', '租金+人工+水电'], answer: 0 },
+      { q: '外卖的"毛利计算公式"是？', options: ['售价-食材成本-包装费', '售价-平台佣金-配送费', '售价-全部成本', '售价-食材成本'], answer: 0 },
+      { q: '以下哪种方式可以有效降低外卖包装成本？', options: ['使用更便宜但质量差的包装', '统一包装规格实现批量采购', '减少包装层数', '让用户自备包装'], answer: 1 },
+      { q: '外卖行业的"盈亏平衡点"主要取决于？', options: ['日均订单量和客单价', '店铺面积和员工数', '配送范围和骑手数', '平台补贴力度'], answer: 0 },
+      { q: '一份25元的外卖订单，平台佣金20%，食材成本8元，包装2元，毛利是多少？', options: ['10元', '5元', '7元', '3元'], answer: 0 },
+      { q: '外卖商家的"隐性成本"不包括以下哪项？', options: ['差评导致的流量损失', '退单带来的食材浪费', '平台佣金', '高峰期出餐延迟的罚款'], answer: 2 },
+      { q: '以下哪个指标最能反映外卖店铺的盈利能力？', options: ['日营收', '毛利率', '订单量', '评分'], answer: 1 },
+      { q: '外卖"满减"策略中，以下哪组设置容易导致"薅羊毛"亏损？', options: ['满30减5', '满20减15', '满50减10', '满80减20'], answer: 1 }
+    ]
+  },
+  {
+    emoji: '📱', name: '抖音外卖运营', desc: '直播带货与短视频运营', total: 8, progress: 0,
+    questions: [
+      { q: '抖音外卖"直播+外卖"模式的核心优势是？', options: ['配送更快', '所见即所得，转化率高', '价格更低', '品类更多'], answer: 1 },
+      { q: '抖音外卖直播的最佳时长建议是？', options: ['1-2小时', '3-4小时', '6-8小时', '15分钟'], answer: 0 },
+      { q: '以下哪种抖音短视频内容形式最有利于外卖转化？', options: ['纯广告展示', '美食制作过程+下单引导', '搞笑段子', '风景视频'], answer: 1 },
+      { q: '抖音外卖的"团购券"与"直接下单"的区别是？', options: ['没有区别', '团购券核销周期更长，到店自提', '团购券更便宜', '直接下单更快'], answer: 1 },
+      { q: '抖音外卖直播中，以下哪个话术最容易促成下单？', options: ['这道菜很好吃', '限时5折，只剩最后20份', '我们店很好', '欢迎下单'], answer: 1 },
+      { q: '抖音外卖商家的"POI"是指？', options: ['广告投放工具', '店铺地理位置信息', '用户评价系统', '数据分析工具'], answer: 1 },
+      { q: '以下哪种方法可以有效提升抖音外卖的曝光？', options: ['增加菜品数量', '开通抖音来客+本地推投放', '降低菜品价格', '延长营业时间'], answer: 1 },
+      { q: '抖音外卖的"达人探店"合作，以下哪种计费模式最常见？', options: ['纯佣金', '固定费用+佣金', '纯固定费用', '免费合作'], answer: 1 }
+    ]
+  }
+];
+
+// ===== RENDER FUNCTIONS =====
+
+function renderNews() {
+  const list = document.getElementById('newsList');
+  list.innerHTML = newsData.map((n, i) => `
+    <div class="news-card" onclick="openArticle(${i})">
+      <div class="news-card-header">
+        <span class="news-source ${n.sourceClass}">${n.source}</span>
+        <span class="news-time">${n.time}</span>
+      </div>
+      <div class="news-title">${n.title}</div>
+      <div class="news-summary">${n.summary}</div>
+      <div class="news-tags">
+        ${n.tags.map(t => `<span class="news-tag">${t}</span>`).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function openArticle(idx) {
+  const n = newsData[idx];
+  document.getElementById('articleModalTitle').textContent = n.source + ' · 文章详情';
+  document.getElementById('articleModalBody').innerHTML = `
+    <div class="article-meta">${n.time} · ${n.tags.join(' / ')}</div>
+    <h3 style="font-size:17px;font-weight:700;margin-bottom:14px;line-height:1.6;">${n.title}</h3>
+    <div class="article-content">${n.content.split('\n\n').map(p => `<p>${p}</p>`).join('')}</div>
+  `;
+  document.getElementById('articleModal').classList.add('show');
+}
+
+function closeArticleModal() {
+  document.getElementById('articleModal').classList.remove('show');
+}
+
+function renderKnowledge() {
+  const grid = document.getElementById('kbGrid');
+  grid.innerHTML = knowledgeData.map((k, i) => `
+    <div class="kb-card" onclick="showKbDetail(${i})">
+      <div class="kb-icon">${k.icon}</div>
+      <div class="kb-name">${k.name}</div>
+      <div class="kb-count">${k.count} 个条目</div>
+    </div>
+  `).join('');
+}
+
+function showKbDetail(idx) {
+  const k = knowledgeData[idx];
+  const detail = document.getElementById('kbDetail');
+  detail.style.display = 'block';
+  detail.innerHTML = `
+    <div class="kb-detail">
+      <div class="kb-detail-title">📁 ${k.name}</div>
+      ${k.items.map(item => `
+        <div class="kb-item">
+          <span class="kb-item-icon">${item.icon}</span>
+          <div class="kb-item-text">
+            <div class="kb-item-title">${item.title}</div>
+            <div class="kb-item-desc">${item.desc}</div>
+          </div>
+          <span class="kb-item-arrow">›</span>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function renderQuiz() {
+  const list = document.getElementById('quizList');
+  list.innerHTML = quizData.map((q, i) => `
+    <div class="quiz-card" onclick="startQuiz(${i})">
+      <div class="quiz-card-top">
+        <span class="quiz-emoji">${q.emoji}</span>
+        <div class="quiz-info">
+          <div class="quiz-name">${q.name}</div>
+          <div class="quiz-desc">${q.desc}</div>
+        </div>
+      </div>
+      <div class="quiz-progress-bar">
+        <div class="quiz-progress-fill" style="width:${q.progress}%"></div>
+      </div>
+      <div class="quiz-meta">
+        <span>进度 ${q.progress}%</span>
+        <span>${q.total} 题</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ===== QUIZ LOGIC =====
+let currentQuiz = null;
+let currentQuestion = 0;
+let correctCount = 0;
+let answered = false;
+
+function startQuiz(idx) {
+  currentQuiz = idx;
+  currentQuestion = 0;
+  correctCount = 0;
+  answered = false;
+  document.getElementById('quizModalTitle').textContent = quizData[idx].name;
+  renderQuestion();
+  document.getElementById('quizModal').classList.add('show');
+}
+
+function renderQuestion() {
+  const q = quizData[currentQuiz];
+  const qItem = q.questions[currentQuestion];
+  answered = false;
+  document.getElementById('quizModalBody').innerHTML = `
+    <div style="font-size:13px;color:#999;margin-bottom:8px;">第 ${currentQuestion+1}/${q.total} 题</div>
+    <div class="quiz-question">${qItem.q}</div>
+    <div class="quiz-options">
+      ${qItem.options.map((opt, i) => `
+        <button class="quiz-option" data-idx="${i}" onclick="selectAnswer(${i})">${String.fromCharCode(65+i)}. ${opt}</button>
+      `).join('')}
+    </div>
+  `;
+}
+
+function selectAnswer(idx) {
+  if (answered) return;
+  answered = true;
+  const q = quizData[currentQuiz].questions[currentQuestion];
+  const options = document.querySelectorAll('.quiz-option');
+  options.forEach((opt, i) => {
+    if (i === q.answer) opt.classList.add('correct');
+    if (i === idx && i !== q.answer) opt.classList.add('wrong');
+  });
+  if (idx === q.answer) correctCount++;
+  setTimeout(() => {
+    currentQuestion++;
+    if (currentQuestion < quizData[currentQuiz].questions.length) {
+      renderQuestion();
+    } else {
+      showQuizResult();
+    }
+  }, 1200);
+}
+
+function showQuizResult() {
+  const q = quizData[currentQuiz];
+  const score = Math.round(correctCount / q.total * 100);
+  const emoji = score >= 80 ? '🎉' : score >= 60 ? '👍' : '💪';
+  document.getElementById('quizModalBody').innerHTML = `
+    <div class="quiz-result">
+      <div class="quiz-result-icon">${emoji}</div>
+      <div class="quiz-result-text">答题完成！</div>
+      <div class="quiz-result-score">${score}分</div>
+      <div style="font-size:14px;color:#666;margin-bottom:8px;">正确 ${correctCount}/${q.total} 题</div>
+      <button class="quiz-btn" onclick="startQuiz(${currentQuiz})">重新挑战</button>
+    </div>
+  `;
+}
+
+function closeQuizModal() {
+  document.getElementById('quizModal').classList.remove('show');
+}
+
+// ===== TAB SWITCHING =====
+document.querySelectorAll('.tab-btn, .nav-item').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tab = btn.dataset.tab;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add('active');
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.getElementById(`tab-${tab}`).classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.querySelector(`.nav-item[data-tab="${tab}"]`).classList.add('active');
+  });
+});
+
+// ===== REFRESH =====
+function refreshNews() {
+  document.getElementById('lastRefresh').textContent = '刚刚';
+  // Simulate new data count
+  const count = 128 + Math.floor(Math.random() * 20);
+  document.getElementById('newsCount').textContent = count;
+}
+
+// Auto refresh time
+setInterval(() => {
+  const el = document.getElementById('lastRefresh');
+  if (el.textContent === '刚刚') el.textContent = '1分钟前';
+  else {
+    const m = parseInt(el.textContent) || 1;
+    el.textContent = (m+1) + '分钟前';
+  }
+}, 60000);
+
+// ===== INIT =====
+renderNews();
+renderKnowledge();
+renderQuiz();
+</script>
+</body>
+</html>
