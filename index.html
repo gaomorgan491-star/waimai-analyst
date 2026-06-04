@@ -548,61 +548,122 @@
 
 <script>
 // ===== DATA =====
-// ===== REAL NEWS: fetch from RSS feeds via rss2json (parallel) =====
-const RSS_SOURCES = [
-  { name: '36氪', rss: 'https://36kr.com/feed', className: 'source-36kr' },
-  { name: '爱范儿', rss: 'https://www.ifanr.com/feed', className: 'source-ifanr' },
-  { name: 'IT之家', rss: 'https://www.ithome.com/rss/', className: 'source-ithome' },
-  { name: '少数派', rss: 'https://feeds.feedburner.com/playpcesor', className: 'source-sspai' }
+// ===== PRE-EMBEDDED REAL NEWS (auto-updated by GitHub Actions) =====
+// Last updated: 2026-06-04 16:00:00
+
+const newsData = [
+  {
+    source: 'IT之家',
+    sourceClass: 'source-ithome',
+    time: '35分钟前',
+    title: '今日芒种：仲夏开始，收获可期',
+    summary: 'IT之家 6 月 5 日消息，今日迎来“芒种”节气，这是二十四节气中的第九个节气，夏季的第三个节气。在芒种期间，太阳将逐日靠近，它在北半球运行轨迹的最北端，北半球白昼时间最长的日子就要到了。 芒种，是麦类等有芒作物成熟的意思。《月令七十二候',
+    url: 'https://www.ithome.com/0/960/181.htm',
+    tags: ["行业资讯"]
+  },
+  {
+    source: 'IT之家',
+    sourceClass: 'source-ithome',
+    time: '49分钟前',
+    title: 'IDC 称下半年全球 PC 市场将迎动荡期：短期没有“速效药”，核心问题是缺内存',
+    summary: 'IT之家 6 月 4 日消息，IDC（国际数据公司）2 日发布的报告称，全球 PC 市场将在 2026 年下半年迎来一段动荡时期，而且短期内没有快速解法。IDC 目前预计，2026 年全球 PC 出货量 同比将下降 11.3% 。随着时间推',
+    url: 'https://www.ithome.com/0/960/180.htm',
+    tags: ["PC"]
+  },
+  {
+    source: 'IT之家',
+    sourceClass: 'source-ithome',
+    time: '1小时前',
+    title: '铭瑄首发 Panther Lake、Wildcat Lake 芯 MoDT 主板，将移动处理器引入桌面平台',
+    summary: 'IT之家 6 月 4 日消息，据 Wccftech 今日报道，铭瑄在 2026 台北国际电脑展上展示了其基于英特尔 Panther Lake 和 Wildcat Lake 处理器的“Mobile on Desktop”（MoDT）主板，成为',
+    url: 'https://www.ithome.com/0/960/179.htm',
+    tags: ["行业资讯"]
+  },
+  {
+    source: 'IT之家',
+    sourceClass: 'source-ithome',
+    time: '1小时前',
+    title: '惠普-法拉利车队联手打造 AI PC：6 月 12 日上市，5599 美元限量 4999 台',
+    summary: 'IT之家 6 月 4 日消息，在今天的摩纳哥大奖赛前，惠普限量版法拉利车队 AI PC 正式发布。根据介绍，惠普限量版法拉利车队源自近两年的深度合作。法拉利大胆的设计理念，与惠普在工业设计和精密工程上的经验被整合到同一台设备中。最终成果，是',
+    url: 'https://www.ithome.com/0/960/178.htm',
+    tags: ["AI", "PC"]
+  },
+  {
+    source: 'IT之家',
+    sourceClass: 'source-ithome',
+    time: '1小时前',
+    title: '30 秒速读 6 月 5 日 618 攻略：iPhone 17 PM 2T 美版 9439 元，京东 PLUS 会员年卡 49.5 元学生专享',
+    summary: '618 大促 6 月 5 日继续，有需求的小伙伴可以蹲蹲看哦 ~ 京东无门槛红包 至高 26618 元，每天抽 3 次 ： 点此抽取 淘宝无门槛红包 至高 26888 元，每天抽 1 次 ： 点此抽取 京东 / 淘宝无门槛红包可直接在各平台',
+    url: 'https://www.ithome.com/0/960/177.htm',
+    tags: ["行业资讯"]
+  },
+  {
+    source: '36氪',
+    sourceClass: 'source-36kr',
+    time: '6小时前',
+    title: '00后创业者站上C位，「go big or go home」｜36氪离线聚会第二期',
+    summary: '“妨碍真理发现过程的，不是谎言，而是极其精辟的错误见解。”德国物理学家兼讽刺作家利希滕贝格在面对启蒙运动中的种种愚昧时，戏谑式地写下了这一句名言。 许多误判之所以危险，恰恰因为它们看上去过于正确。它们能在一个短周期里解释世界，也容易在世界已',
+    url: 'https://36kr.com/p/3838702884604421?f=rss',
+    tags: ["创业"]
+  },
+  {
+    source: '36氪',
+    sourceClass: 'source-36kr',
+    time: '6小时前',
+    title: '实现芯片设计验证自动化，提升开发效率10倍以上，「智维创芯」完成数千万元天使轮融资｜36氪首发',
+    summary: '从芯片行业在资本市场的狂飙，到华为发布“韬（τ）定律”，AI浪潮带动下，烈火烹油的半导体行业进入超级周期，推动芯片设计等上游产业链迎来需求爆发。 但随着需求暴增，设计复杂度不断提高，芯片验证周期过长，拖累开发节奏的瓶颈也越来越明显。2024',
+    url: 'https://36kr.com/p/3838488706370054?f=rss',
+    tags: ["AI", "芯片"]
+  },
+  {
+    source: '36氪',
+    sourceClass: 'source-36kr',
+    time: '6小时前',
+    title: '氪星晚报 ｜OpenAI首席财务官谈公司AI设备：今年年底前将正式发布；腾讯客服回应与华为、小米等合作；香港推出首个生产力级超级智能体',
+    summary: '大公司： OpenAI首席财务官谈公司AI设备：今年年底前将正式发布 OpenAI首席财务官Sarah Friar日前在受访时透露，已经亲自体验过OpenAI的AI设备。她表示到“今年年底之前”OpenAI将正式发布这款产品。此前，Open',
+    url: 'https://36kr.com/p/3838652242823687?f=rss',
+    tags: ["AI"]
+  },
+  {
+    source: '36氪',
+    sourceClass: 'source-36kr',
+    time: '10小时前',
+    title: '36氪独家｜2026 年字节 AI 的四个关键命题',
+    summary: '文｜周鑫雨 编辑｜张雨忻 杨轩 《智能涌现》从多个信源处独家获悉，2026 年，字节 AI 有四个重要的命题： 加大对世界模型训练的投入，年底前，模型 性能达到现阶段世界模型全球 SOTA（最佳）Google Genie 3 的水平。 视频',
+    url: 'https://36kr.com/p/3838454229027072?f=rss',
+    tags: ["AI"]
+  },
+  {
+    source: '爱范儿',
+    sourceClass: 'source-ifanr',
+    time: '12小时前',
+    title: '今年最值得升级的生产力工具，可能是一整张 AI 工位',
+    summary: '照顾好自己，就是 AI 时代最实在的生产力。 #欢迎关注爱范儿官方微信公众号：爱范儿（微信号：ifanr），更多精彩内容第一时间为您奉上。',
+    url: 'https://www.ifanr.com/1667995?utm_source=rss&utm_medium=rss&utm_campaign=',
+    tags: ["AI"]
+  },
+  {
+    source: '36氪',
+    sourceClass: 'source-36kr',
+    time: '13小时前',
+    title: '李宁需要库里，但库里更需要李宁',
+    summary: '作者 | 谢芸子 编辑 | 张帆 一条消息让体育圈炸了锅。 6月2日，NBA球星斯蒂芬·库里与中国运动品牌李宁，签下了一为期十年的代言。双方均未披露具体金额，但业内口径相当统一：这是一份总价超过4亿美元（约合27亿元人民币）的超级合同。 据',
+    url: 'https://36kr.com/p/3838185031305474?f=rss',
+    tags: ["行业资讯"]
+  },
+  {
+    source: '爱范儿',
+    sourceClass: 'source-ifanr',
+    time: '14小时前',
+    title: '制糖工厂发布 AI 小电拼 Mirror：FluxAI 自由流让多口充电进入「功率复用」时代',
+    summary: '制糖工厂 CANDYSIGN AI 小电拼 Mirror，作为 AI 小电拼系列的新一代旗舰产品，Mirror 延续 4C 五口设计，4 个 USB-C 口均支持最高 140W 输出，并通过 FluxAI 自由流® 算法，在多设备场景下实现',
+    url: 'https://www.ifanr.com/1667933?utm_source=rss&utm_medium=rss&utm_campaign=',
+    tags: ["AI"]
+  }
 ];
 
-async function fetchNews() {
-  const API = 'https://api.rss2json.com/v1/api.json?rss_url=';
-  const allNews = [];
-
-  // Fetch all feeds in parallel for speed
-  const results = await Promise.allSettled(
-    RSS_SOURCES.map(src =>
-      fetch(API + encodeURIComponent(src.rss), { signal: AbortSignal.timeout(6000) })
-        .then(r => r.json())
-        .then(data => {
-          if (data.status !== 'ok' || !data.items) return [];
-          return data.items.slice(0, 4).map(item => ({
-            source: src.name,
-            sourceClass: src.className,
-            time: formatTime(item.pubDate),
-            title: (item.title || '').replace(/<[^>]+>/g, '').trim(),
-            summary: (item.description || item.title || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 100),
-            url: item.link || '',
-            _ts: item.pubDate ? new Date(item.pubDate).getTime() : 0
-          }));
-        })
-        .catch(() => [])
-    )
-  );
-
-  for (const r of results) {
-    if (r.status === 'fulfilled' && r.value) allNews.push(...r.value);
-  }
-
-  allNews.sort((a, b) => (b._ts || 0) - (a._ts || 0));
-  return allNews.slice(0, 12);
-}
-
-function formatTime(dateStr) {
-  try {
-    const d = new Date(dateStr);
-    if (isNaN(d)) return '近期';
-    const diff = (Date.now() - d) / 1000;
-    if (diff < 60) return '刚刚';
-    if (diff < 3600) return Math.floor(diff/60) + '分钟前';
-    if (diff < 86400) return Math.floor(diff/3600) + '小时前';
-    return Math.floor(diff/86400) + '天前';
-  } catch(e) { return '近期'; }
-}
-
 function extractTags(text) {
-  const keywords = ['外卖','美团','饿了么','抖音','科技','AI','政策','餐饮','电商','即时零售','直播','供应链','手机','芯片','苹果'];
+  const keywords = ['外卖','美团','饿了么','抖音','科技','AI','政策','餐饮','电商','即时零售','直播','供应链','手机','芯片','苹果','PC','半导体','创业'];
   const tags = [];
   for (const kw of keywords) {
     if (text.includes(kw) && tags.length < 2) tags.push(kw);
@@ -611,19 +672,17 @@ function extractTags(text) {
   return tags;
 }
 
-async function renderNews() {
+function renderNews() {
   const list = document.getElementById('newsList');
-  list.innerHTML = '<div style="text-align:center;padding:40px;color:#999;font-size:14px;">正在获取最新资讯...</div>';
-
-  const newsData = await fetchNews();
-
   if (newsData.length === 0) {
-    list.innerHTML = '<div style="text-align:center;padding:40px;color:#999;font-size:14px;">暂无法获取资讯，请稍后再试<br><button onclick="renderNews()" style="margin-top:12px;padding:8px 20px;border:none;background:var(--primary);color:#fff;border-radius:8px;font-size:13px;cursor:pointer;">重新加载</button></div>';
+    list.innerHTML = '<div style="text-align:center;padding:40px;color:#999;font-size:14px;">暂无资讯</div>';
     return;
   }
 
-  list.innerHTML = newsData.map((n, i) => `
-    <div class="news-card" onclick="window.open('${n.url}', '_blank')" style="cursor:pointer;">
+  list.innerHTML = newsData.map((n, i) => {
+    const tags = extractTags(n.title + ' ' + n.summary);
+    return `
+    <div class="news-card" onclick="window.open(n.url, '_blank')" style="cursor:pointer;">
       <div class="news-card-header">
         <span class="news-source ${n.sourceClass}">${n.source}</span>
         <span class="news-time">${n.time}</span>
@@ -632,16 +691,14 @@ async function renderNews() {
       <div class="news-summary">${n.summary}</div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
         <div class="news-tags">
-          ${extractTags(n.title + ' ' + n.summary).map(t => `<span class="news-tag">${t}</span>`).join('')}
+          ${tags.map(t => `<span class="news-tag">${t}</span>`).join('')}
         </div>
         <span style="font-size:12px;color:#999;">查看原文 →</span>
       </div>
     </div>
-  `).join('');
+  `;
+  }).join('');
 }
-
-
-
 
 function renderKnowledge() {
   const grid = document.getElementById('kbGrid');
