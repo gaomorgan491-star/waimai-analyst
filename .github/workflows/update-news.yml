@@ -1,0 +1,179 @@
+name: Update News
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'  # 每6小时更新一次
+  workflow_dispatch:  # 支持手动触发
+
+permissions:
+  contents: write
+
+jobs:
+  update-news:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Fetch RSS and update news
+        run: |
+          import json, re, urllib.request
+          from datetime import datetime, timezone
+
+          def fetch_rss(rss_url):
+              api = f"https://api.rss2json.com/v1/api.json?rss_url={urllib.request.quote(rss_url)}"
+              try:
+                  req = urllib.request.Request(api, headers={"User-Agent": "Mozilla/5.0"})
+                  with urllib.request.urlopen(req, timeout=15) as resp:
+                      data = json.loads(resp.read())
+                  if data.get("status") != "ok":
+                      return []
+                  items = []
+                  for item in data.get("items", [])[:5]:
+                      title = re.sub(r'<[^>]+>', '', item.get("title", "")).strip()
+                      desc = re.sub(r'<[^>]+>', ' ', item.get("description", "")).strip()
+                      desc = re.sub(r'\s+', ' ', desc)[:120]
+                      pub = item.get("pubDate", "")
+                      link = item.get("link", "")
+                      items.append({"title": title, "summary": desc, "pubDate": pub, "url": link})
+                  return items
+              except Exception as e:
+                  print(f"  Error fetching {rss_url}: {e}")
+                  return []
+
+          sources = [
+              {"name": "36氪", "rss": "https://36kr.com/feed", "className": "source-36kr"},
+              {"name": "爱范儿", "rss": "https://www.ifanr.com/feed", "className": "source-ifanr"},
+              {"name": "IT之家", "rss": "https://www.ithome.com/rss/", "className": "source-ithome"},
+          ]
+
+          all_news = []
+          for src in sources:
+              print(f"Fetching {src['name']}...")
+              items = fetch_rss(src["rss"])
+              print(f"  Got {len(items)} items")
+              for item in items:
+                  item["source"] = src["name"]
+                  item["sourceClass"] = src["className"]
+                  all_news.append(item)
+
+          all_news.sort(key=lambda x: x.get("pubDate", ""), reverse=True)
+          all_news = all_news[:12]
+
+          # Read current HTML
+          with open("index.html", "r", encoding="utf-8") as f:
+              content = f.read()
+
+          # Build newsData
+          def format_time(pub_date):
+              try:
+                  d = datetime.strptime(pub_date, "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc)
+                  diff = (datetime.now(timezone.utc) - d).total_seconds()
+                  if diff < 60: return '刚刚'
+                  if diff < 3600: return f'{int(diff//60)}分钟前'
+                  if diff < 86400: return f'{int(diff//3600)}小时前'
+                  return f'{int(diff//86400)}天前'
+              except:
+                  return '近期'
+
+          def extract_tags(text):
+              keywords = ['外卖','美团','饿了么','抖音','科技','AI','政策','餐饮','电商','即时零售','直播','供应链','手机','芯片','苹果','PC','半导体','创业']
+              tags = []
+              for kw in keywords:
+                  if kw in text and len(tags) < 2:
+                      tags.append(kw)
+              if not tags:
+                  tags.append('行业资讯')
+              return tags
+
+          news_lines = []
+          for item in all_news:
+              time_str = format_time(item['pubDate'])
+              tags = extract_tags(item['title'] + ' ' + item['summary'])
+              title_escaped = item['title'].replace("\\", "\\\\").replace("'", "\\'").replace("\n", " ")
+              summary_escaped = item['summary'].replace("\\", "\\\\").replace("'", "\\'").replace("\n", " ")
+              url_escaped = item['url'].replace("\\", "\\\\").replace("'", "\\'")
+              news_lines.append(f"""  {{
+    source: '{item["source"]}',
+    sourceClass: '{item["sourceClass"]}',
+    time: '{time_str}',
+    title: '{title_escaped}',
+    summary: '{summary_escaped}',
+    url: '{url_escaped}',
+    tags: {json.dumps(tags, ensure_ascii=False)}
+  }}""")
+
+          news_array = ',\n'.join(news_lines)
+
+          # Find and replace the newsData section
+          start_marker = '// ===== PRE-EMBEDDED REAL NEWS'
+          end_marker = 'function renderKnowledge()'
+
+          start_idx = content.find(start_marker)
+          end_idx = content.find(end_marker)
+
+          if start_idx != -1 and end_idx != -1:
+              new_section = f"""// ===== PRE-EMBEDDED REAL NEWS (auto-updated by GitHub Actions) =====
+// Last updated: {all_news[0]['pubDate'] if all_news else 'N/A'}
+
+const newsData = [
+{news_array}
+];
+
+function extractTags(text) {{
+  const keywords = ['外卖','美团','饿了么','抖音','科技','AI','政策','餐饮','电商','即时零售','直播','供应链','手机','芯片','苹果','PC','半导体','创业'];
+  const tags = [];
+  for (const kw of keywords) {{
+    if (text.includes(kw) && tags.length < 2) tags.push(kw);
+  }}
+  if (tags.length === 0) tags.push('行业资讯');
+  return tags;
+}}
+
+function renderNews() {{
+  const list = document.getElementById('newsList');
+  if (newsData.length === 0) {{
+    list.innerHTML = '<div style="text-align:center;padding:40px;color:#999;font-size:14px;">暂无资讯</div>';
+    return;
+  }}
+
+  list.innerHTML = newsData.map((n, i) => {{
+    const tags = extractTags(n.title + ' ' + n.summary);
+    return `
+    <div class="news-card" onclick="window.open(n.url, '_blank')" style="cursor:pointer;">
+      <div class="news-card-header">
+        <span class="news-source ${{n.sourceClass}}">${{n.source}}</span>
+        <span class="news-time">${{n.time}}</span>
+      </div>
+      <div class="news-title">${{n.title}}</div>
+      <div class="news-summary">${{n.summary}}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
+        <div class="news-tags">
+          ${{tags.map(t => `<span class="news-tag">${{t}}</span>`).join('')}}
+        </div>
+        <span style="font-size:12px;color:#999;">查看原文 →</span>
+      </div>
+    </div>
+  `;
+  }}).join('');
+}}
+
+"""
+              content = content[:start_idx] + new_section + content[end_idx:]
+
+              with open("index.html", "w", encoding="utf-8") as f:
+                  f.write(content)
+              print(f"Updated news: {len(all_news)} items")
+          else:
+              print("ERROR: Could not find news section markers")
+        shell: python3 {0}
+
+      - name: Commit and push if changed
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git diff --quiet index.html || (git add index.html && git commit -m "auto: update news feed $(date +'%Y-%m-%d %H:%M')" && git push)
